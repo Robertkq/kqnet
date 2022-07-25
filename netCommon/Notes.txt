@@ -1,0 +1,16 @@
+asio::post, da un task context-ului, o functie de executat.
+Ar fii fain sa faci o schita la cum merge tot.. dar pare putin cam greu
+
+
+Ai terminat server-ul. Destul de interesant pana acum.
+
+
+
+1. De ce asa ?
+m_deqConnections.erase(
+						std::remove(m_deqConnections.begin(), m_deqConnections.end(), nullptr), m_deqConnections.end());
+
+2. Fiecare connection de la server are task-ul lui pe context-ul serverului de a da Read/Write Head/Body ?
+
+3. check all FIXME: comments
+4. Add OnClientValidated , maybe OnClientUnvalidated() / or something for when the validation fails ("local" blacklist)
