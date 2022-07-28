@@ -1,2 +1,44 @@
 ﻿  mainClient.cpp
+D:\infoVS\Projects\kqnet\kqnet\netServer\server.h(65,18): warning C4834: discarding return value of function with 'nodiscard' attribute
+D:\infoVS\Projects\kqnet\kqnet\netServer\server.h(62): message : while compiling class template member function 'void kq::server_interface<T>::__RemoveUnvalidatedClient(kq::connection<T> *)'
+          with
+          [
+              T=ServerTags
+          ]
+D:\infoVS\Projects\kqnet\kqnet\netCommon\connection.h(407): message : see reference to function template instantiation 'void kq::server_interface<T>::__RemoveUnvalidatedClient(kq::connection<T> *)' being compiled
+          with
+          [
+              T=ServerTags
+          ]
+D:\infoVS\Projects\kqnet\kqnet\netCommon\connection.h(243): message : see reference to class template instantiation 'kq::server_interface<T>' being compiled
+          with
+          [
+              T=ServerTags
+          ]
+D:\infoVS\Projects\kqnet\kqnet\netCommon\connection.h(215): message : while compiling class template member function 'void kq::connection<T>::WriteHead(void)'
+          with
+          [
+              T=ServerTags
+          ]
+D:\infoVS\Projects\kqnet\kqnet\netCommon\connection.h(208): message : see reference to function template instantiation 'void kq::connection<T>::WriteHead(void)' being compiled
+          with
+          [
+              T=ServerTags
+          ]
+D:\infoVS\Projects\kqnet\kqnet\netClient\client.h(89): message : while compiling class template member function 'void kq::client_interface<ServerTags>::Disconnect(void)'
+D:\infoVS\Projects\kqnet\kqnet\netClient\client.h(54): message : see reference to function template instantiation 'void kq::client_interface<ServerTags>::Disconnect(void)' being compiled
+D:\infoVS\Projects\kqnet\kqnet\netClient\client.h(46): message : while compiling class template member function 'kq::client_interface<ServerTags>::client_interface(uint64_t (__cdecl *)(uint64_t))'
+D:\infoVS\Projects\kqnet\kqnet\netClient\mainClient.cpp(25): message : see reference to function template instantiation 'kq::client_interface<ServerTags>::client_interface(uint64_t (__cdecl *)(uint64_t))' being compiled
+D:\infoVS\Projects\kqnet\kqnet\netClient\mainClient.cpp(23): message : see reference to class template instantiation 'kq::client_interface<ServerTags>' being compiled
+D:\infoVS\Projects\kqnet\kqnet\netServer\server.h(58,18): warning C4834: discarding return value of function with 'nodiscard' attribute
+D:\infoVS\Projects\kqnet\kqnet\netServer\server.h(55): message : while compiling class template member function 'void kq::server_interface<T>::__RemoveClient(kq::connection<T> *)'
+          with
+          [
+              T=ServerTags
+          ]
+D:\infoVS\Projects\kqnet\kqnet\netCommon\connection.h(243): message : see reference to function template instantiation 'void kq::server_interface<T>::__RemoveClient(kq::connection<T> *)' being compiled
+          with
+          [
+              T=ServerTags
+          ]
   netClient.vcxproj -> D:\infoVS\Projects\kqnet\kqnet\Debug\netClient.exe

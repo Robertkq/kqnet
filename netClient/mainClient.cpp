@@ -31,19 +31,13 @@ struct client : kq::client_interface<ServerTags>
 
 int main()
 {
-
     client Player;
 
     Player.name = "Robert";
 
     Player.Connect("79.118.12.219", 60000);
 
-    while (Player.IsValidated() == false)
-    {
-        // This while loop waits until the client is validated
-        // If the client is not validated, it is not entitled to send messages
-        
-    }
+    
         
         kq::message<ServerTags> msg;
         msg.head.id = ServerTags::RequestAccept;

@@ -5,6 +5,8 @@
 #include "message.h"
 #include "tsqueue.h"
 
+#include "..\netServer\server.h"
+
 namespace kq
 {
     template<typename T>
@@ -18,7 +20,7 @@ namespace kq
         };
 
         connection() = delete;
-        connection(owner parent, asio::io_context& context, asio::ip::tcp::socket socket, tsqueue<owned_message<T>>& qIn, uint64_t(*func)(uint64_t));
+        connection(owner parent, asio::io_context& context, asio::ip::tcp::socket socket, tsqueue<owned_message<T>>& qIn, uint64_t(*func)(uint64_t), kq::server_interface<T>* serverAddress);
         connection(connection<T>&& other) noexcept;
         virtual ~connection() {}
 
@@ -26,6 +28,7 @@ namespace kq
         connection<T>& operator=(connection<T>&& other) noexcept;
 
         uint32_t getID() const { return m_id; }
+        asio::ip::tcp::socket::endpoint_type getIP() { return m_ip; }
 
         void ConnectToClient(uint32_t uid);
         void ConnectToServer(const asio::ip::tcp::resolver::results_type& endpoints);
@@ -77,14 +80,17 @@ namespace kq
         uint64_t m_ValidateNumberCheck;
 
         uint64_t (*m_scrambleFunc)(uint64_t);
-
+        kq::server_interface<T>* m_serverPtr;
+        asio::ip::tcp::socket::endpoint_type m_ip;
         bool m_bValidated;
+
+
     }; // end of connection<T>
     
     template<typename T>
-    connection<T>::connection(owner parent, asio::io_context& context, asio::ip::tcp::socket socket, tsqueue<owned_message<T>>& qIn, uint64_t (*scrambleFunc)(uint64_t))
+    connection<T>::connection(owner parent, asio::io_context& context, asio::ip::tcp::socket socket, tsqueue<owned_message<T>>& qIn, uint64_t (*scrambleFunc)(uint64_t), kq::server_interface<T>* serverAddress)
         : m_context(context), m_socket(std::move(socket)), m_qMessagesOut(), m_qMessagesIn(qIn), m_msgTemporaryIn(), m_ownerType(parent), m_id(0),
-        m_ValidateNumberIn(0), m_ValidateNumberOut(0), m_ValidateNumberCheck(0), m_scrambleFunc(scrambleFunc), m_bValidated(false)
+        m_ValidateNumberIn(0), m_ValidateNumberOut(0), m_ValidateNumberCheck(0), m_scrambleFunc(scrambleFunc), m_serverPtr(serverAddress), m_ip(), m_bValidated(false)
     {
         if (parent == owner::server)
         {
@@ -95,12 +101,44 @@ namespace kq
     }
 
     template<typename T>
+    connection<T>::connection(connection<T>&& other) noexcept
+        : m_context(std::move(other.m_context)), m_socket(std::move(other.m_socket)), m_qMessagesOut(std::move(other.m_qMessagesOut)), m_qMessagesIn(std::move(m_qMessagesIn)),
+        m_msgTemporaryIn(std::move(other.m_msgTemporaryIn)), m_ownerType(other.m_ownerType), m_id(other.m_id), m_ValidateNumberIn(other.m_ValidateNumberIn),
+        m_ValidateNumberOut(other.m_ValidateNumberOut), m_ValidateNumberCheck(other.m_ValidateNumberCheck), m_scrambleFunc(other.m_scrambleFunc), m_serverPtr(other.m_serverPtr), m_ip(other.m_ip),
+        m_bValidated(other.m_bValidated)
+    {
+        
+    }
+
+    template<typename T>
+    connection<T>& connection<T>::operator=(connection<T>&& other) noexcept
+    {
+        m_context               = std::move(other.m_context);
+        m_socket                = std::move(other.m_socket);
+        m_qMessagesOut          = std::move(other.m_qMessagesOut);
+        m_qMessagesIn           = std::move(other.m_qMessagesIn);
+        m_msgTemporaryIn        = std::move(other.m_msgTemporaryIn);
+        m_ownerType             = other.m_ownerType;
+        m_id                    = other.m_id;
+        m_ValidateNumberIn      = other.m_ValidateNumberIn;
+        m_ValidateNumberOut     = other.m_ValidateNumberOut;
+        m_ValidateNumberCheck   = other.m_ValidateNumberCheck;
+        m_scrambleFunc          = other.m_scrambleFunc;
+        m_serverPtr             = other.m_serverPtr;
+        m_ip                    = std::move(m_ip);
+        other.m_serverPtr       = nullptr; // maybe reconsider ?
+        m_bValidated            = other.m_bValidated;
+
+    }
+
+    template<typename T>
     void connection<T>::ConnectToClient(uint32_t uid)
     {
         if (m_ownerType == owner::server)
         {
             if (m_socket.is_open())
             {
+                m_ip = m_socket.remote_endpoint();
                 m_id = uid;
                 // Was: ReadHead();
                 // Before starting to read messages, we will validate the client by sending him a number on which he shall perform 
@@ -121,6 +159,7 @@ namespace kq
                 [this](std::error_code ec, asio::ip::tcp::endpoint endpoint) {
                     if (!ec)
                     {
+                        m_ip =  m_socket.remote_endpoint();
                         //Was: ReadHead();
                         //Whenever we connect to the server we expect to receive a number for validation
                         ReadValidation();
@@ -200,6 +239,8 @@ namespace kq
                     //There was a problem in sending the message
                     std::cout << '[' << m_id << ']' << "WriteHead() ERROR: " << ec.message() << '\n';
                     m_socket.close();
+                    if (m_serverPtr != nullptr)
+                        return m_serverPtr->__RemoveClient(this);
                 }
             });
     }
@@ -224,6 +265,8 @@ namespace kq
                     // There was a problem in sending the body message.
                     std::cout << '[' << m_id << ']' << "WriteBody() ERROR: " << ec.message() << '\n';
                     m_socket.close();
+                    if (m_serverPtr != nullptr)
+                        return m_serverPtr->__RemoveClient(this);
                 }
             });
     }
@@ -259,6 +302,8 @@ namespace kq
                     // There was a problem in reading the message head.
                     std::cout << '[' << m_id << ']' << "ReadHead() ERROR: " << ec.message() << '\n';
                     m_socket.close();
+                    if (m_serverPtr != nullptr)
+                        return m_serverPtr->__RemoveClient(this);
                 }
             });
     }
@@ -278,6 +323,8 @@ namespace kq
                 {
                     std::cout << '[' << m_id << ']' << "ReadBody() ERROR: " << ec.message() << '\n';
                     m_socket.close();
+                    if (m_serverPtr != nullptr)
+                        return m_serverPtr->__RemoveClient(this);
                 }
             });
     }
@@ -320,6 +367,8 @@ namespace kq
                 {
                     std::cout << '[' << m_id << ']' << "WriteValidation() ERROR: " << ec.message() << '\n';
                     m_socket.close();
+                    if (m_serverPtr != nullptr)
+                        return m_serverPtr->__RemoveUnvalidatedClient(this);
                 }
             });
     }
@@ -347,12 +396,15 @@ namespace kq
                         {
                             // Send a message to the client, informing it that it has been successfully validated;
                             WriteValidationSuccess();
-
+                            if (m_serverPtr != nullptr)
+                                m_serverPtr->OnClientValidated(this);
 
                         }
                         else
                         {
                             m_socket.close();
+                            if (m_serverPtr != nullptr)
+                                return m_serverPtr->__RemoveUnvalidatedClient(this);
                         }
                     }
                 }
@@ -360,6 +412,8 @@ namespace kq
                 {
                     std::cout << '[' << m_id << ']' << "ReadValidation() ERROR: " << ec.message() << '\n';
                     m_socket.close();
+                    if (m_serverPtr != nullptr)
+                        return m_serverPtr->__RemoveUnvalidatedClient(this);
                 }
             });
     }

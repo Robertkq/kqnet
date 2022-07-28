@@ -25,7 +25,18 @@ struct server :  kq::server_interface<ServerTags>
 protected:
     
     bool OnClientConnect(kq::connection<ServerTags>* client) override { return true; }
-    void OnClientDisconnect(kq::connection<ServerTags>* client) override {}
+    void OnClientDisconnect(kq::connection<ServerTags>* client) override 
+    {
+        std::cout << "Succesfully disconnected " << client->getID() << " " << client->getIP() << "\n";
+    }
+    void OnClientValidated(kq::connection<ServerTags>* client) override 
+    {
+        std::cout << "Client " << client->getID() << " Validated.\n";
+    }
+    void OnClientUnvalidated(kq::connection<ServerTags>* client) override
+    {
+        std::cout << client->getIP() << " UNVALIDATED! \n";
+    }
     void OnMessage(kq::connection<ServerTags>* client, kq::message<ServerTags>& msg) override 
     {
         std::cout << "Responding to Client " << client->getID() << ", msg id: " << msg.head.id << ", msg size: " << msg.size() << '\n';

@@ -26,10 +26,7 @@ namespace kq
 
         void Send(const message<T>& msg);
 
-        tsqueue<owned_message<T>>& Incoming()
-        {
-            return m_qMessagesIn;
-        }
+        tsqueue<owned_message<T>>& Incoming();
 
 
 
@@ -66,11 +63,18 @@ namespace kq
             asio::ip::tcp::resolver resolver(m_context);
             asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host, std::to_string(port));
 
-            m_connection = new connection<T>(connection<T>::owner::client, m_context, asio::ip::tcp::socket(m_context), m_qMessagesIn, m_scrambleFunc);
+            m_connection = new connection<T>(connection<T>::owner::client, m_context, asio::ip::tcp::socket(m_context), m_qMessagesIn, m_scrambleFunc, nullptr);
 
             m_connection->ConnectToServer(endpoints);
 
             m_thrContext = std::thread([this]() { m_context.run(); });
+
+            while (IsValidated() == false)
+            {
+                // This while loop waits until the client is validated
+                // Until the client is not validated, it is not entitled to send messages
+                // If the client is not validated, the server will close the connection
+            }
         }
         catch (std::exception ec)
         {

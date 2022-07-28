@@ -23,6 +23,8 @@ namespace kq
         void Stop();
 
         void WaitForClientConnection();
+
+        void KickClient(connection<T>* client);
         
         void MessageClient(connection<T>* client, const message<T>& msg);
 
@@ -32,18 +34,38 @@ namespace kq
         // nMessagesMax is the maximum amount of messages to answer to in the call to Update
         void Update(size_t nMessagesMax = -1);
 
-        protected:
+
+        
+
+    public:
 
             // The end user is supposed to implement those functions in a derived type, implementing the desired behaviour.
 
             // @ client - is a pointer to a connection which is the clients connected to the server
             // @ msg - is a message which holds informations sent from clients to the server and should be responded to
 
+            
             virtual bool OnClientConnect(connection<T>* client) = 0;
             virtual void OnClientDisconnect(connection<T>* client) = 0;
+            virtual void OnClientValidated(connection<T>* client) = 0;
+            virtual void OnClientUnvalidated(connection<T>* client) = 0;
             virtual void OnMessage(connection<T>* client, message<T>& msg) = 0;
+            
 
+    public:
+        void __RemoveClient(connection<T>* client)
+        {
+            OnClientDisconnect(client);
+            delete client;
+            std::remove(m_qConnections.begin(), m_qConnections.end(), client);
+        }
 
+        void __RemoveUnvalidatedClient(connection<T>* client)
+        {
+            OnClientUnvalidated(client);
+            delete client;
+            std::remove(m_qConnections.begin(), m_qConnections.end(), client);
+        }
 
 
     private:
@@ -61,6 +83,7 @@ namespace kq
         uint32_t m_id; // ID system for connections
 
         uint64_t(*m_scrambleFunc)(uint64_t);
+        
     }; // end of server_interface
 
     template<typename T>
@@ -121,7 +144,7 @@ namespace kq
                     // We successfully got a new connection to the server
                     std::cout << "[Server] New Connection: " << socket.remote_endpoint() << '\n';
 
-                    connection<T>* newconn = new connection<T>(connection<T>::owner::server, m_context, std::move(socket), m_qMessagesIn, m_scrambleFunc);
+                    connection<T>* newconn = new connection<T>(connection<T>::owner::server, m_context, std::move(socket), m_qMessagesIn, m_scrambleFunc, this);
                     // Give the end user the choice to accept or decline certain connections
                     if (OnClientConnect(newconn) == true)
                     {
@@ -147,6 +170,12 @@ namespace kq
     }
 
     template<typename T>
+    void KickClient(connection<T>* client)
+    {
+        __RemoveClient(client);
+    }
+
+    template<typename T>
     void server_interface<T>::MessageClient(connection<T>* client, const message<T>& msg)
     {
         if (client != nullptr && client->IsConnected() == true)
@@ -156,11 +185,7 @@ namespace kq
         else
         {
             // If we can't communicate with the client, remove it from the active connections 
-            OnClientDisconnect(client);
-
-            delete client;
-
-            std::remove(m_qConnections.begin(), m_qConnections().end(), client);
+            RemoveClient(client);
         }
     }
 
@@ -181,6 +206,8 @@ namespace kq
             }
             else
             {
+                // dont use RemoveClient() here because it would modify the container while looping it
+                // or find a method to use it 
                 removeClients = true;
                 OnClientDisconnect(client);
                 delete client;
