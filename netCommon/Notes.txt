@@ -1,7 +1,0 @@
-
-
-3. check all FIXME: comments
-
-4. go over all files and implement functions separately from declaration
-
-5. make a IRC chat app :P
