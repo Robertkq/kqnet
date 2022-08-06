@@ -18,4 +18,5 @@ virtual void OnMessage(connection<T>* client, message<T>& msg) = 0;
 
 
 Examples:
+
 Simple chat room [The Wired](https://github.com/Robertkq/TheWired)
