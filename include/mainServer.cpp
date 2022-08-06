@@ -1,3 +1,10 @@
+/*
+    This cpp file is for testing, for a better example on how to use kqnet go to:
+    FIXME: Add "the" project to github and link it here
+*/
+
+
+
 #include <iostream>
 
 #include "kqnet.h"
