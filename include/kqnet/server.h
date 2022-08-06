@@ -4,7 +4,7 @@
 #include "common.h"
 #include "message.h"
 #include "tsqueue.h"
-// FIXME: shouldnt this also include connection ? where is it getting it from ?
+#include "connection.h"
 
 namespace kq
 {
@@ -12,8 +12,6 @@ namespace kq
     struct server_interface
     {
     public:
-
-        // FIXME: Add all sorts of constructors and operators
         
         server_interface(uint16_t port, uint64_t(*scrambleFunc)(uint64_t));
         

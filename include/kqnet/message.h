@@ -53,7 +53,6 @@ namespace kq
         template<typename dataType>
         message<T>& operator>>(dataType& value);
 
-        //Was: private: | FIXME: W/R H/B functions need access to head & body addresses, add functions to keep them private ?
     public:
         message_header<T> head;
         std::vector<uint8_t> body;

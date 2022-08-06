@@ -58,7 +58,6 @@ namespace kq
         void AddToIncomingQueue();
 
         void WriteValidation();
-        // FIXME: pass a pointer to the server so you can call OnClientValidate(this), also perhaps if not validated add to a blacklist
         void ReadValidation();
 
         void WriteValidationSuccess();
@@ -67,7 +66,7 @@ namespace kq
         
 
     protected:
-        asio::io_context& m_context; // A context for the socket to work on                            FIXME: MAYBE REWRITE THIS INTO " This context is shared with the whole asio instance "
+        asio::io_context& m_context; // The context for the socket to work on                           
         asio::ip::tcp::socket m_socket; // Each connection will have a unique socket to the remote
         tsqueue<message<T>> m_qMessagesOut; // Queue holding messages to be sent to remote
         tsqueue<owned_message<T>>& m_qMessagesIn; // Reference to incoming queue of parent object
@@ -372,7 +371,7 @@ namespace kq
             });
     }
 
-    // FIXME: pass a pointer to the server so you can call OnClientValidate(this), also perhaps if not validated add to a blacklist
+    
 
     template<typename T>
     void connection<T>::ReadValidation()

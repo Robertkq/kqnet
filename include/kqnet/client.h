@@ -11,7 +11,6 @@ namespace kq
     struct client_interface
     {
     public:
-        // FIXME: ADD ALL SORTS OF CONSTRUCTOR & OPERATORS
         client_interface(uint64_t(*scrambleFunc)(uint64_t));
 
         virtual ~client_interface();
@@ -42,11 +41,8 @@ namespace kq
 
     template<typename T>
     client_interface<T>::client_interface(uint64_t(*scrambleFunc)(uint64_t))
-
-    {
-        m_scrambleFunc = scrambleFunc;
-        //FIXME: add init-list
-    }
+        : m_context(), m_thrContext(), m_connection(nullptr), m_qMessagesIn(), m_scrambleFunc(scrambleFunc)
+    {} 
 
     template<typename T>
     client_interface<T>::~client_interface()
