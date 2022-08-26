@@ -1,4 +1,4 @@
-kqnet is a easy-to-use networking library written in C++17, internally it uses [asio](https://think-async.com/Asio/) to perform asynchronous communication.
+kqnet is a easy-to-use networking library written in C++14, internally it uses [asio](https://think-async.com/Asio/) to perform asynchronous communication.
 
 The library implements `client_interface<T>`, `server_interface<T>`, `connection<T>`, `message<T>`.
 
