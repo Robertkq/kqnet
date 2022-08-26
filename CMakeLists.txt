@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(kqnet)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include_directories("include/asio-1.20.0/include")
 

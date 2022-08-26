@@ -16,7 +16,8 @@ enum ServerTags : uint8_t
     ServerReject,
     RequestAccept,
     MessageRequest,
-    MessageSent
+    MessageSent,
+    Ping
 };
 
 uint64_t scramble(uint64_t nInput) 
@@ -38,11 +39,12 @@ struct client : kq::client_interface<ServerTags>
 
 int main()
 {
+    std::cout << "New version\n";
     client Player;
 
     Player.name = "Robert";
 
-    Player.Connect("79.118.12.219", 60000);
+    Player.Connect("82.78.104.21", 60000);
 
     
         

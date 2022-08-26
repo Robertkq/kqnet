@@ -15,7 +15,8 @@ enum ServerTags : uint8_t
     ServerReject,
     RequestAccept,
     MessageRequest,
-    MessageSent
+    MessageSent,
+    Ping
 };
 
 uint64_t scramble(uint64_t nInput)
@@ -59,6 +60,7 @@ protected:
 
 int main()
 {
+    std::cout << "New version\n";
     server Server(60000, &scramble);
     Server.Start();
     while (true)

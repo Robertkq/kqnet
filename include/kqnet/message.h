@@ -21,7 +21,6 @@ namespace kq
         T& getID() { return id; }
         const T& getID() const { return id; }
             
-        // Was: private: FIXME: Certain functions need access to size / id, add functions to keep them private ?
     public: 
         T id;
         size_t size = 0;
@@ -55,7 +54,7 @@ namespace kq
 
     public:
         message_header<T> head;
-        std::vector<uint8_t> body;
+        kq::vector<uint8_t> body;
 
     };
 

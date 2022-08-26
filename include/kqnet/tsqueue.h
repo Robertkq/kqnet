@@ -83,7 +83,7 @@ namespace kq
 
 	protected:
 		std::mutex muxQueue;
-		std::deque<T> deqQueue;
+		kq::deque<T> deqQueue;
 	};
 }
 

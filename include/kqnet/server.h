@@ -60,7 +60,7 @@ namespace kq
     private:
         // Queues for messages and connections
         tsqueue<owned_message<T>> m_qMessagesIn;
-        std::deque<connection<T>*> m_qConnections;
+        kq::deque<connection<T>*> m_qConnections;
 
         // Asio context and it's own thread
         asio::io_context m_context;
@@ -113,7 +113,7 @@ namespace kq
     template<typename T>
     void server_interface<T>::Stop()
     {
-        for (auto client : m_qConnections)
+        for (auto& client : m_qConnections)
             delete client;
 
         m_context.stop();

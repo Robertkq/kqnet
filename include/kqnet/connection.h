@@ -153,11 +153,13 @@ namespace kq
     {
         if (m_ownerType == owner::client)
         {
+            std::cout << m_socket.is_open() << "\n";
             asio::async_connect(m_socket, endpoints,
                 [this](std::error_code ec, asio::ip::tcp::endpoint endpoint) {
                     if (!ec)
                     {
                         m_ip =  m_socket.remote_endpoint();
+                        std::cout << "Connected\n";
                         //Was: ReadHead();
                         //Whenever we connect to the server we expect to receive a number for validation
                         ReadValidation();
@@ -168,6 +170,11 @@ namespace kq
                         std::cout << "ConnectToServer() ERROR: " << ec.message() << "\n";
                     }
                 });
+            std::cout << m_socket.is_open() << "\n";
+            for (auto it = endpoints.begin(); it != endpoints.end(); ++it)
+            {
+                std::cout << it->endpoint() << " <- IP\n";
+            }
         }
     }
 
@@ -175,7 +182,7 @@ namespace kq
     void connection<T>::Disconnect()
     {
         if (IsConnected())
-            asio::post(m_context, [this]() {m_socket.close(); });
+            asio::post(m_context, [this]() { m_socket.close(); });
     }
 
     template<typename T>

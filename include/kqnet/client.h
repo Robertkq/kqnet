@@ -70,6 +70,8 @@ namespace kq
                 // This while loop waits until the client is validated
                 // Until the client is not validated, it is not entitled to send messages
                 // If the client is not validated, the server will close the connection
+                std::cout << "a";
+                Sleep(1000);
             }
         }
         catch (std::exception ec)
