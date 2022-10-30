@@ -90,7 +90,7 @@ namespace kq
     template<typename T>
     connection<T>::connection(owner parent, asio::io_context& context, asio::ip::tcp::socket socket, tsqueue<owned_message<T>>& qIn, uint64_t (*scrambleFunc)(uint64_t), kq::server_interface<T>* serverAddress)
         : m_context(context), m_socket(std::move(socket)), m_qMessagesOut(), m_qMessagesIn(qIn), m_msgTemporaryIn(), m_ownerType(parent), m_id(0),
-        m_ValidateNumberIn(0), m_ValidateNumberOut(0), m_ValidateNumberCheck(0), m_scrambleFunc(scrambleFunc), m_serverPtr(serverAddress), m_ip(), m_bValidated(false)
+        m_ValidateNumberIn(0), m_ValidateNumberOut(0), m_ValidateNumberCheck(0), m_scrambleFunc(scrambleFunc), m_serverPtr(serverAddress), m_ip(m_socket.remote_endpoint()), m_bValidated(false)
     {
         if (parent == owner::server)
         {
