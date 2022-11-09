@@ -36,7 +36,6 @@ namespace kq
         void Disconnect();
 
         bool IsConnected() const;
-        bool IsValidated() const;
 
         // Send a message to the remote
         void Send(const kq::message<T>& msg);
@@ -82,6 +81,7 @@ namespace kq
         uint64_t (*m_scrambleFunc)(uint64_t);
         kq::server_interface<T>* m_serverPtr;
         asio::ip::tcp::socket::endpoint_type m_ip;
+
         bool m_bValidated;
 
 
@@ -128,7 +128,6 @@ namespace kq
         m_ip                    = std::move(m_ip);
         other.m_serverPtr       = nullptr; // maybe reconsider ?
         m_bValidated            = other.m_bValidated;
-
     }
 
     template<typename T>
@@ -183,14 +182,11 @@ namespace kq
     template<typename T>
     bool connection<T>::IsConnected() const
     {
-        return m_socket.is_open();
+        // A client is "only" connected to the server once it's validated
+        return m_socket.m_bValidated;
     }
 
-    template<typename T>
-    bool connection<T>::IsValidated() const
-    {
-        return m_bValidated;
-    }
+    
 
     template<typename T>
     // Send a message to the remote

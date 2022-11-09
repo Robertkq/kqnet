@@ -21,7 +21,6 @@ namespace kq
 
         bool IsConnected() const;
 
-        bool IsValidated() const;
 
         void Send(const message<T>& msg);
 
@@ -65,7 +64,7 @@ namespace kq
 
             m_thrContext = std::thread([this]() { m_context.run(); });
 
-            while (IsValidated() == false)
+            while (IsConnected() == false)
             {
                 // This while loop waits until the client is validated
                 // Until the client is not validated, it is not entitled to send messages
@@ -96,13 +95,7 @@ namespace kq
     template<typename T>
     bool client_interface<T>::IsConnected() const
     {
-        return m_connection != nullptr && m_connection->IsConnected() == true;
-    }
-
-    template<typename T>
-    bool client_interface<T>::IsValidated() const
-    {
-        return IsConnected() && m_connection->IsValidated();
+        return (m_connection != nullptr) && (m_connection->IsConnected() == true);
     }
 
     template<typename T>
