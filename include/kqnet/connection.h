@@ -183,7 +183,7 @@ namespace kq
     bool connection<T>::IsConnected() const
     {
         // A client is "only" connected to the server once it's validated
-        return m_socket.m_bValidated;
+        return m_bValidated;
     }
 
     
