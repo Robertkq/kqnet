@@ -14,9 +14,9 @@
 #include <cstdint>
 
 
-#include "..\kqlib\include\kqlib.h"
-#include "..\asio-1.20.0\include\asio.hpp"
-#include "..\asio-1.20.0\include\asio\ts\buffer.hpp"
-#include "..\asio-1.20.0\include\asio\ts\internet.hpp"
+#include "kqlib.h"
+#include "asio.hpp"
+#include "asio/ts/buffer.hpp"
+#include "asio/ts/internet.hpp"
 
 #endif
