@@ -27,7 +27,15 @@ struct testServer : public kq::server_interface<msgids>
 
     void OnMessage(kq::connection<msgids>* client, kq::message<msgids>& msg)
     {
+        switch(msg.getID())
+        {
+            case Transmitted:
+                MessageClient(client, kq::message<msgids>{msgids::Received});
+            break;
 
+            case Received:
+            break;
+        }
     }
 };
 
